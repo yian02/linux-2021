@@ -4,6 +4,8 @@
  * data structures.
  */
 
+
+
 #include <assert.h>
 #include <inttypes.h>
 #include <stdalign.h>
@@ -50,10 +52,10 @@ static inline int tid(void)
     return tid_v;
 }
 
-/* Create a new hazard pointer array of size 'max_hps' (or a reasonable
- * default value if 'max_hps' is 0). The function 'deletefunc' will be
- * used to delete objects protected by hazard pointers when it becomes
- * safe to retire them.
+/* Create a new hazard pointer array of size 'max_hps' (or a
+ * reasonable default value if 'max_hps' is 0). The function
+ * 'deletefunc' will be used to delete objects protected by
+ * hazard pointers when it becomes safe to retire them.
  */
 list_hp_t *list_hp_new(size_t max_hps, list_hp_deletefunc_t *deletefunc)
 {
@@ -160,8 +162,7 @@ void list_hp_retire(list_hp_t *hp, uintptr_t ptr)
 #include <pthread.h>
 
 #define N_ELEMENTS 128
-// #define N_THREADS (NNN)
-#define N_THREADS (64)
+#define N_THREADS 64
 #define MAX_THREADS 128
 
 static atomic_uint_fast32_t deletes = 0, inserts = 0;
@@ -252,7 +253,6 @@ try_again:
                 *par_curr = curr;
                 *par_prev = prev;
                 *par_next = next;
-                // return FFF;
                 return *key == get_unmarked_node(curr)->key;
             }
             prev = &get_unmarked_node(curr)->next;
@@ -324,7 +324,6 @@ bool list_delete(list_t *list, list_key_t key)
 
         if (atomic_compare_exchange_strong(prev, &tmp, get_unmarked(next))) {
             list_hp_clear(list->hp);
-            // DDD;
             list_hp_retire(list->hp, get_unmarked(curr));
         } else {
             list_hp_clear(list->hp);
